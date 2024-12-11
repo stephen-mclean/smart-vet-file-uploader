@@ -8,4 +8,14 @@ orbs:
 workflows:
   build:
     jobs:
-      - cypress/run
+      - cypress/run:
+        post-checkout:
+          - run:
+            name: Set up environment variables
+            steps:
+              - jq/install
+              - run:
+                name: Extract bucket variable
+                environment:
+                  WEBHOOK_BUCKET: << pipeline.trigger_parameters.webhook.body | jq -r '.bucket' >>
+                command: echo "CYPRESS_BUCKET=$WEBHOOK_BUCKET" >> $BASH_ENV
