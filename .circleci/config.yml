@@ -9,7 +9,7 @@ workflows:
   build:
     jobs:
       - cypress/run:
-        post-checkout:
+        post-install:
           - run:
             name: Set up environment variables
             steps:
