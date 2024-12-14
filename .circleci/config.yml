@@ -11,8 +11,8 @@ jobs:
       - run:
           name: Parse CYPRESS_BUCKET environment variable
           command: |
-            CYPRESS_BUCKET=$(echo $CIRCLE_PIPELINE_TRIGGER_PARAMETERS_WEBHOOK_BODY | jq -r .bucket)
-            echo "CYPRESS_BUCKET=$CYPRESS_BUCKET" >> $BASH_ENV
+            CYPRESS_BUCKET=$(echo << pipeline.trigger_parameters.webhook.body >> | jq -r .bucket)
+            echo "export CYPRESS_BUCKET=$CYPRESS_BUCKET" >> $BASH_ENV
       - run:
           name: Print CYPRESS_BUCKET
           command: |
