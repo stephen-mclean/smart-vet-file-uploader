@@ -10,12 +10,13 @@ jobs:
       - jq/install
       - run:
           name: Parse CYPRESS_BUCKET environment variable
-          environment:
-            CYPRESS_BUCKET: << pipeline.trigger_parameters.webhook.body >> | jq .bucket
           command: |
+            CYPRESS_BUCKET=$(echo $CIRCLE_PIPELINE_TRIGGER_PARAMETERS_WEBHOOK_BODY | jq -r .bucket)
             echo "CYPRESS_BUCKET=$CYPRESS_BUCKET" >> $BASH_ENV
       - run: |
           printenv CYPRESS_BUCKET
+      - run: |
+          cp $BASH_ENV bash.env
       - persist_to_workspace:
           root: .
           paths:
