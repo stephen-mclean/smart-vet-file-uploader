@@ -25,6 +25,16 @@ jobs:
           root: .
           paths:
             - bash.env
+  load-env-vars:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - attach_workspace:
+          at: .
+      - run: |
+          cat bash.env >> $BASH_ENV
+      - run: |
+          printenv CYPRESS_BUCKET
 
   install-and-persist:
     executor: cypress/default
@@ -42,18 +52,22 @@ jobs:
       - attach_workspace:
           at: ~/
       - cypress/run-tests:
-          cypress-command: npx cypress run --component --parallel --record
+          cypress-command: npx cypress run
 workflows:
   use-my-orb:
     jobs:
       - parse-environment-vars:
           name: Parse Environment Variables
+      - load-env-vars:
+          name: Load Environment Variables
+          requires:
+            - Parse Environment Variables
       - install-and-persist:
           name: Install & Persist To Workspace
           requires:
-            - Parse Environment Variables
+            - Load Environment Variables
       - run-tests-in-parallel:
           name: Run Tests in Parallel
           requires:
             - Install & Persist To Workspace
-            - Parse Environment Variables
+            - Load Environment Variables
