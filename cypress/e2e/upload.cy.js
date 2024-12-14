@@ -8,12 +8,8 @@ describe("template spec", () => {
     const visitDate = Cypress.env("VISIT_DATE");
     const bucket = Cypress.env("BUCKET");
 
-    console.log(" === running upload with ===", {
-      clientName,
-      petName,
-      visitDate,
-      bucket,
-    });
+    cy.task("log", "Running Cypress Upload");
+    cy.task("log", bucket);
 
     if (
       !username ||
