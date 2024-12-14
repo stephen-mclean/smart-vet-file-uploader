@@ -6,8 +6,23 @@ describe("template spec", () => {
     const clientName = Cypress.env("CLIENT_NAME");
     const petName = Cypress.env("PET_NAME");
     const visitDate = Cypress.env("VISIT_DATE");
+    const bucket = Cypress.env("BUCKET");
 
-    if (!username || !password || !clientName || !petName || !visitDate) {
+    console.log(" === running upload with ===", {
+      clientName,
+      petName,
+      visitDate,
+      bucket,
+    });
+
+    if (
+      !username ||
+      !password ||
+      !clientName ||
+      !petName ||
+      !visitDate ||
+      !bucket
+    ) {
       return;
     }
 
