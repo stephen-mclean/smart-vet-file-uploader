@@ -13,8 +13,12 @@ jobs:
           command: |
             CYPRESS_BUCKET=$(echo $CIRCLE_PIPELINE_TRIGGER_PARAMETERS_WEBHOOK_BODY | jq -r .bucket)
             echo "CYPRESS_BUCKET=$CYPRESS_BUCKET" >> $BASH_ENV
-      - run: |
-          printenv CYPRESS_BUCKET
+      - run:
+          name: Print CYPRESS_BUCKET
+          command: |
+            # Print the environment variable to verify it's set correctly
+            echo "CYPRESS_BUCKET=$CYPRESS_BUCKET"
+            printenv CYPRESS_BUCKET
       - run: |
           cp $BASH_ENV bash.env
       - persist_to_workspace:
