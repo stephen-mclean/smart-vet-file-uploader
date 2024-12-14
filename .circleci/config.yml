@@ -1,21 +1,54 @@
-version: 2.1
+version: "2.1"
 orbs:
-  # "cypress-io/cypress@3" installs the latest published
-  # version "s.x.y" of the orb. We recommend you then use
-  # the strict explicit version "cypress-io/cypress@3.x.y"
-  # to lock the version and prevent unexpected CI changes
   cypress: cypress-io/cypress@3
+  jq: circleci/jq@3.0.1
+jobs:
+  parse-environment-vars:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - jq/install
+      - run:
+          name: Parse CYPRESS_BUCKET environment variable
+          environment:
+            CYPRESS_BUCKET: << pipeline.trigger_parameters.webhook.body >> | jq .bucket
+          command: |
+            echo "CYPRESS_BUCKET=$CYPRESS_BUCKET" >> $BASH_ENV
+      - run: |
+          printenv CYPRESS_BUCKET
+      - persist_to_workspace:
+          root: .
+          paths:
+            - bash.env
+
+  install-and-persist:
+    executor: cypress/default
+    steps:
+      - cypress/install
+      - persist_to_workspace:
+          paths:
+            - .cache/Cypress
+            - project
+          root: ~/
+  run-tests-in-parallel:
+    executor: cypress/default
+    parallelism: 8
+    steps:
+      - attach_workspace:
+          at: ~/
+      - cypress/run-tests:
+          cypress-command: npx cypress run --component --parallel --record
 workflows:
-  build:
+  use-my-orb:
     jobs:
-      - cypress/run:
-        post-install:
-          - run:
-            name: Set up environment variables
-            steps:
-              - jq/install
-              - run:
-                name: Extract bucket variable
-                environment:
-                  WEBHOOK_BUCKET: << pipeline.trigger_parameters.webhook.body | jq -r '.bucket' >>
-                command: echo "CYPRESS_BUCKET=$WEBHOOK_BUCKET" >> $BASH_ENV
+      - parse-environment-vars:
+          name: Parse Environment Variables
+      - install-and-persist:
+          name: Install & Persist To Workspace
+          requires:
+            - Parse Environment Variables
+      - run-tests-in-parallel:
+          name: Run Tests in Parallel
+          requires:
+            - Install & Persist To Workspace
+            - Parse Environment Variables
