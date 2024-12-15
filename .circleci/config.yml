@@ -34,14 +34,14 @@ jobs:
           paths:
             - .cache/Cypress
             - project
-          root: ~/
+          root: .
 
   run-tests-in-parallel:
     executor: cypress/default
     parallelism: 8
     steps:
       - attach_workspace:
-          at: ~/
+          at: .
       - run: |
           cat bash.env >> $BASH_ENV
       - run: |
