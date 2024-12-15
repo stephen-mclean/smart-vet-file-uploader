@@ -42,10 +42,18 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/
-      - run: |
-          cat bash.env >> $BASH_ENV
-      - run: |
-          printenv CYPRESS_BUCKET
+      - jq/install
+      - run:
+          name: Parse CYPRESS_BUCKET environment variable
+          command: |
+            CYPRESS_BUCKET=$(echo '<< pipeline.trigger_parameters.webhook.body >>' | jq -r .bucket)
+            echo "export CYPRESS_BUCKET=$CYPRESS_BUCKET" >> $BASH_ENV
+      - run:
+          name: Print CYPRESS_BUCKET
+          command: |
+            # Print the environment variable to verify it's set correctly
+            echo "CYPRESS_BUCKET=$CYPRESS_BUCKET"
+            printenv CYPRESS_BUCKET
       - cypress/run-tests:
           cypress-command: npx cypress run
 
