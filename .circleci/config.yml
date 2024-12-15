@@ -3,29 +3,6 @@ orbs:
   cypress: cypress-io/cypress@3
   jq: circleci/jq@3.0.1
 jobs:
-  parse-environment-vars:
-    docker:
-      - image: cimg/base:current
-    steps:
-      - jq/install
-      - run:
-          name: Parse CYPRESS_BUCKET environment variable
-          command: |
-            CYPRESS_BUCKET=$(echo '<< pipeline.trigger_parameters.webhook.body >>' | jq -r .bucket)
-            echo "export CYPRESS_BUCKET=$CYPRESS_BUCKET" >> $BASH_ENV
-      - run:
-          name: Print CYPRESS_BUCKET
-          command: |
-            # Print the environment variable to verify it's set correctly
-            echo "CYPRESS_BUCKET=$CYPRESS_BUCKET"
-            printenv CYPRESS_BUCKET
-      - run: |
-          cp $BASH_ENV ~/bash.env
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - bash.env
-
   install-and-persist:
     executor: cypress/default
     steps:
@@ -60,12 +37,9 @@ jobs:
 workflows:
   use-my-orb:
     jobs:
-      - parse-environment-vars:
-          name: Parse Environment Variables
       - install-and-persist:
           name: Install & Persist To Workspace
       - run-tests-in-parallel:
           name: Run Tests in Parallel
           requires:
             - Install & Persist To Workspace
-            - Parse Environment Variables

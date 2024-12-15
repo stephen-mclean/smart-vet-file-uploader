@@ -5,20 +5,12 @@ describe("template spec", () => {
 
     const clientName = Cypress.env("CLIENT_NAME");
     const petName = Cypress.env("PET_NAME");
-    const visitDate = Cypress.env("VISIT_DATE");
     const bucket = Cypress.env("BUCKET");
 
     cy.task("log", "Running Cypress Upload");
     cy.task("log", bucket);
 
-    if (
-      !username ||
-      !password ||
-      !clientName ||
-      !petName ||
-      !visitDate ||
-      !bucket
-    ) {
+    if (!username || !password || !clientName || !petName || !bucket) {
       return;
     }
 
@@ -37,12 +29,12 @@ describe("template spec", () => {
     });
 
     cy.get("a[href='#patients']").click();
-    cy.contains(petName).click();
+    cy.contains(petName, { matchCase: false }).click();
 
     cy.get("a[href='#visits']").click();
 
-    cy.contains(visitDate)
-      .parent("tr")
+    cy.get("tr")
+      .eq(0)
       .within(() => {
         cy.get("a").eq(1).click();
       });
