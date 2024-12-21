@@ -10,5 +10,8 @@
   "license": "ISC",
   "devDependencies": {
     "cypress": "^13.16.1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.717.0"
   }
 }
