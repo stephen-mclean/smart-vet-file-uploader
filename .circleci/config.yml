@@ -33,7 +33,7 @@ jobs:
       - run:
           name: Parse CYPRESS_CLIENT_NAME environment variable
           command: |
-            CYPRESS_CLIENT_NAME=$(echo '<< pipeline.trigger_parameters.webhook.body >>' | jq -r .client)
+            CYPRESS_CLIENT_NAME="$(echo '<< pipeline.trigger_parameters.webhook.body >>' | jq -r .client)"
             echo "export CYPRESS_CLIENT_NAME=$CYPRESS_CLIENT_NAME" >> $BASH_ENV
       - run:
           name: Print CYPRESS_CLIENT_NAME

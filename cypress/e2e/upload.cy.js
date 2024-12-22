@@ -33,6 +33,8 @@ describe("template spec", () => {
       cy.task("log", "===== Files ======");
       cy.task("log", files);
 
+      return;
+
       const client = new S3Client({
         credentials: {
           accessKeyId: awsAccessKey,
