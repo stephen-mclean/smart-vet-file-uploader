@@ -21,16 +21,35 @@ jobs:
           at: ~/
       - jq/install
       - run:
-          name: Parse CYPRESS_BUCKET environment variable
+          name: Parse CYPRESS_FILES_LIST environment variable
           command: |
-            CYPRESS_BUCKET=$(echo '<< pipeline.trigger_parameters.webhook.body >>' | jq -r .bucket)
-            echo "export CYPRESS_BUCKET=$CYPRESS_BUCKET" >> $BASH_ENV
+            CYPRESS_FILES_LIST=$(echo '<< pipeline.trigger_parameters.webhook.body >>' | jq -r .files)
+            echo "export CYPRESS_FILES_LIST=$CYPRESS_FILES_LIST" >> $BASH_ENV
       - run:
-          name: Print CYPRESS_BUCKET
+          name: Print CYPRESS_FILES_LIST
           command: |
-            # Print the environment variable to verify it's set correctly
-            echo "CYPRESS_BUCKET=$CYPRESS_BUCKET"
-            printenv CYPRESS_BUCKET
+            echo "CYPRESS_FILES_LIST=$CYPRESS_FILES_LIST"
+            printenv CYPRESS_FILES_LIST
+      - run:
+          name: Parse CYPRESS_CLIENT_NAME environment variable
+          command: |
+            CYPRESS_CLIENT_NAME=$(echo '<< pipeline.trigger_parameters.webhook.body >>' | jq -r .client)
+            echo "export CYPRESS_CLIENT_NAME=$CYPRESS_CLIENT_NAME" >> $BASH_ENV
+      - run:
+          name: Print CYPRESS_CLIENT_NAME
+          command: |
+            echo "CYPRESS_CLIENT_NAME=$CYPRESS_CLIENT_NAME"
+            printenv CYPRESS_CLIENT_NAME
+      - run:
+          name: Parse CYPRESS_PET_NAME environment variable
+          command: |
+            CYPRESS_PET_NAME=$(echo '<< pipeline.trigger_parameters.webhook.body >>' | jq -r .pet)
+            echo "export CYPRESS_PET_NAME=$CYPRESS_PET_NAME" >> $BASH_ENV
+      - run:
+          name: Print CYPRESS_PET_NAME
+          command: |
+            echo "CYPRESS_PET_NAME=$CYPRESS_PET_NAME"
+            printenv CYPRESS_PET_NAME
       - cypress/run-tests:
           cypress-command: npx cypress run
 

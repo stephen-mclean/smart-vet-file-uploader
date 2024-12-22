@@ -5,6 +5,8 @@ import {
 } from "@aws-sdk/client-s3";
 import mimetypes from "mime-types";
 
+const BUCKET = "clinica-files";
+
 describe("template spec", () => {
   it("passes", () => {
     const username = Cypress.env("USERNAME");
@@ -12,13 +14,14 @@ describe("template spec", () => {
 
     const clientName = Cypress.env("CLIENT_NAME");
     const petName = Cypress.env("PET_NAME");
-    const bucket = Cypress.env("BUCKET");
+    const files = Cypress.env("FILES_LIST");
 
     const awsAccessKey = Cypress.env("AWS_ACCESS_KEY_ID");
     const awsAccessSecret = Cypress.env("AWS_SECRET_ACCESS_KEY");
 
     cy.then(async () => {
-      if (!username || !password || !clientName || !petName || !bucket) {
+      if (!username || !password || !clientName || !petName || !files) {
+        cy.task("log", "Missing environment variables");
         return;
       }
 
@@ -27,8 +30,8 @@ describe("template spec", () => {
       cy.task("log", clientName);
       cy.task("log", "===== pet ======");
       cy.task("log", petName);
-      cy.task("log", "===== Bucket ======");
-      cy.task("log", bucket);
+      cy.task("log", "===== Files ======");
+      cy.task("log", files);
 
       const client = new S3Client({
         credentials: {
@@ -38,21 +41,18 @@ describe("template spec", () => {
         region: "eu-north-1",
       });
 
-      const command = new ListObjectsCommand({ Bucket: bucket });
+      const fileIds = files.split(",");
 
-      const result = await client.send(command);
-      const { Contents } = result;
-
-      if (!Contents || Contents.length === 0) {
-        cy.task("log", "No contents found in the bucket");
+      if (!fileIds || fileIds.length === 0) {
+        cy.task("log", "No files to process");
         return;
       }
 
       const mappedContents = await Promise.all(
-        Contents.map(async (content) => {
+        fileIds.map(async (id) => {
           const getObjectCommand = new GetObjectCommand({
-            Bucket: bucket,
-            Key: content.Key,
+            Bucket: BUCKET,
+            Key: id,
           });
 
           const objectResult = await client.send(getObjectCommand);
@@ -61,7 +61,7 @@ describe("template spec", () => {
           const objectExtension = mimetypes.extension(ContentType);
 
           return {
-            key: content.Key,
+            key: id,
             body: objectContents,
             extension: objectExtension,
             mimeType: ContentType,
