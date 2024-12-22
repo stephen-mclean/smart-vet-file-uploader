@@ -41,6 +41,9 @@ describe("template spec", () => {
       cy.task("log", "===== Files ======");
       cy.task("log", files);
 
+      cy.visit("https://clinic.smart-vet.com/Account/LogOn");
+      cy.intercept("/Visit/Upload*").as("upload");
+
       const client = new S3Client({
         credentials: {
           accessKeyId: awsAccessKey,
@@ -85,8 +88,6 @@ describe("template spec", () => {
         );
       });
 
-      cy.visit("https://clinic.smart-vet.com/Account/LogOn");
-
       cy.get("#UserName").type(username);
       cy.get("#Password").type(password);
       cy.get('button[type="submit"]').click();
@@ -126,7 +127,7 @@ describe("template spec", () => {
             encoding: "base64",
           })
           .then(() => {
-            cy.wait(5000);
+            cy.wait("@upload");
             cy.task("log", "File uploaded");
             cy.get("#dialog").within(() => {
               cy.get('a[class="btn btn-success"]').click();
