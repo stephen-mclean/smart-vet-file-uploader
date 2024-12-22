@@ -15,25 +15,31 @@ describe("template spec", () => {
     const clientName = Cypress.env("CLIENT_NAME");
     const petName = Cypress.env("PET_NAME");
     const files = Cypress.env("FILES_LIST");
+    const customerName = clientName.split("_").join(" ");
 
     const awsAccessKey = Cypress.env("AWS_ACCESS_KEY_ID");
     const awsAccessSecret = Cypress.env("AWS_SECRET_ACCESS_KEY");
 
     cy.then(async () => {
-      if (!username || !password || !clientName || !petName || !files) {
+      if (
+        !username ||
+        !password ||
+        !clientName ||
+        !petName ||
+        !files ||
+        !customerName
+      ) {
         cy.task("log", "Missing environment variables");
         return;
       }
 
       cy.task("log", "Running Cypress Upload");
-      cy.task("log", "===== client ======");
-      cy.task("log", clientName);
+      cy.task("log", "===== customer ======");
+      cy.task("log", customerName);
       cy.task("log", "===== pet ======");
       cy.task("log", petName);
       cy.task("log", "===== Files ======");
       cy.task("log", files);
-
-      return;
 
       const client = new S3Client({
         credentials: {
